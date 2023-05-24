@@ -1,10 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 import { IsNotEmpty, IsEmail } from 'class-validator';
+import * as bcrypt from 'bcrypt';
 
 export type UserDocument = User & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class User {
     @Prop({ required: true })
     @IsNotEmpty()
@@ -15,8 +16,20 @@ export class User {
     @IsEmail()
     email: string;
 
+    @Prop({ required: true })
+    @IsNotEmpty()
+    password: string;
+
     @Prop()
     age: number;
+
+    createdAt: Date;
+
+    modifiedAt: Date;
+
+    async comparePassword(enteredPassword: string): Promise<boolean> {
+        return bcrypt.compare(enteredPassword, this.password);
+    }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
