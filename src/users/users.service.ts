@@ -25,6 +25,21 @@ export class UserService {
     return createdUser.save();
   }
 
+  async update(userId: string, updates: Partial<User>): Promise<User> {
+    const user = await this.userModel.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (updates.password) {
+      const hashedPassword = await bcrypt.hash(updates.password, 10);
+      updates.password = hashedPassword;
+    }
+
+    Object.assign(user, updates);
+    return user.save();
+  }
   async findAll(): Promise<User[]> {
     return this.userModel.find().exec();
   }
@@ -35,16 +50,6 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
     return user;
-  }
-
-  async update(id: string, user: User): Promise<User> {
-    const updatedUser = await this.userModel
-      .findByIdAndUpdate(id, user, { new: true })
-      .exec();
-    if (!updatedUser) {
-      throw new NotFoundException('User not found');
-    }
-    return updatedUser;
   }
 
   async delete(id: string): Promise<User> {
