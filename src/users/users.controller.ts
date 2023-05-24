@@ -1,33 +1,65 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+  UsePipes,
+} from '@nestjs/common';
 import { UserService } from './users.service';
 import { User } from './users.model';
+import { ValidationPipe } from '../validation.pipe';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) { }
 
   @Post()
-  create(@Body() user: User): Promise<User> {
-    return this.userService.create(user);
+  @UsePipes(new ValidationPipe())
+  async create(@Body() user: User): Promise<User> {
+    const createdUser = await this.userService.create(user);
+    return createdUser;
   }
 
   @Get()
-  findAll(): Promise<User[]> {
-    return this.userService.findAll();
+  async findAll(): Promise<User[]> {
+    const users = await this.userService.findAll();
+    return users;
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<User> {
-    return this.userService.findOne(id);
+  async findOne(@Param('id') id: string): Promise<User> {
+    try {
+      const user = await this.userService.findOne(id);
+      return user;
+    } catch (error) {
+      throw new NotFoundException('User not found');
+    }
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() user: User): Promise<User> {
-    return this.userService.update(id, user);
+  async update(@Param('id') id: string, @Body() user: User): Promise<User> {
+    try {
+      const updatedUser = await this.userService.update(id, user);
+      return updatedUser;
+    } catch (error) {
+      throw new NotFoundException('User not found');
+    }
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string): Promise<User> {
-    return this.userService.delete(id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async delete(@Param('id') id: string): Promise<void> {
+    try {
+      await this.userService.delete(id);
+    } catch (error) {
+      throw new NotFoundException('User not found');
+    }
   }
 }
