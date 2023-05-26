@@ -24,7 +24,6 @@ export class UserService {
     });
     return createdUser.save();
   }
-
   async update(userId: string, updates: Partial<User>): Promise<User> {
     const user = await this.userModel.findById(userId);
 
@@ -42,10 +41,17 @@ export class UserService {
     Object.assign(user, updates);
     return user.save();
   }
-  async findAll(): Promise<User[]> {
-    return this.userModel.find().exec();
-  }
+  async findAll(sort?: string, order?: string): Promise<User[]> {
+    let query = this.userModel.find();
+    // Check if sorting parameters are provided
+    if (sort && order) {
+      const sortOptions: any = {};
+      sortOptions[sort] = order === 'asc' ? 1 : -1;
+      query = query.sort(sortOptions);
+    }
 
+    return query.exec();
+  }
   async findOne(id: string): Promise<User> {
     const user = await this.userModel.findById(id).exec();
     if (!user) {
@@ -53,7 +59,6 @@ export class UserService {
     }
     return user;
   }
-
   async delete(id: string): Promise<User> {
     const deletedUser = await this.userModel.findByIdAndDelete(id).exec();
     if (!deletedUser) {

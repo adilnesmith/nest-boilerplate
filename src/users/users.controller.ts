@@ -11,6 +11,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UnauthorizedException,
   UsePipes,
 } from '@nestjs/common';
@@ -43,11 +44,10 @@ export class UserController {
       );
     }
   }
-
   @Get()
-  async findAll(): Promise<any> {
+  async findAll(@Query('sort') sort: string, @Query('order') order: string): Promise<any> {
     try {
-      const users = await this.userService.findAll();
+      const users = await this.userService.findAll(sort, order);
       return {
         statusCode: HttpStatus.OK,
         message: 'Users retrieved successfully',
@@ -64,7 +64,6 @@ export class UserController {
       );
     }
   }
-
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<any> {
     try {
