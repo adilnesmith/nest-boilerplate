@@ -10,6 +10,7 @@ import {
   Param,
   Post,
   Put,
+  UnauthorizedException,
   UsePipes,
 } from '@nestjs/common';
 import { UserService } from './users.service';
@@ -61,5 +62,23 @@ export class UserController {
     } catch (error) {
       throw new NotFoundException('User not found');
     }
+  }
+  @Post('change-password')
+  async changePassword(
+    @Body('userId') userId: string,
+    @Body('currentPassword') currentPassword: string,
+    @Body('newPassword') newPassword: string,
+  ): Promise<void> {
+    const user = await this.userService.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isPasswordValid = await this.userService.verifyPassword(user, currentPassword);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid current password');
+    }
+
+    await this.userService.changePassword(userId, newPassword);
   }
 }

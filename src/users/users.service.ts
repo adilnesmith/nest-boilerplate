@@ -61,4 +61,18 @@ export class UserService {
     }
     return deletedUser;
   }
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userModel.findOne({ email }).exec();
+  }
+  async findById(userId: string): Promise<User | null> {
+    return this.userModel.findById(userId).exec();
+  }
+  async verifyPassword(user: User, currentPassword: string): Promise<boolean> {
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    return isPasswordValid;
+  }
+  async changePassword(userId: string, newPassword: string): Promise<void> {
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await this.userModel.findByIdAndUpdate(userId, { password: hashedPassword });
+  }
 }
