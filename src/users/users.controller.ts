@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpException,
   HttpStatus,
   NotFoundException,
   Param,
@@ -23,34 +24,94 @@ export class UserController {
 
   @Post()
   @UsePipes(new ValidationPipe())
-  async create(@Body() user: User): Promise<User> {
-    const createdUser = await this.userService.create(user);
-    return createdUser;
+  async create(@Body() user: User): Promise<any> {
+    try {
+      const createdUser = await this.userService.create(user);
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'User created successfully',
+        data: createdUser,
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Failed to create user',
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   @Get()
-  async findAll(): Promise<User[]> {
-    const users = await this.userService.findAll();
-    return users;
+  async findAll(): Promise<any> {
+    try {
+      const users = await this.userService.findAll();
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Users retrieved successfully',
+        data: users,
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Failed to retrieve users',
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<User> {
+  async findOne(@Param('id') id: string): Promise<any> {
     try {
       const user = await this.userService.findOne(id);
-      return user;
+      if (user) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'User retrieved successfully',
+          data: user,
+        };
+      } else {
+        throw new NotFoundException('User not found');
+      }
     } catch (error) {
-      throw new NotFoundException('User not found');
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Failed to retrieve user',
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() updateUser: Partial<User>): Promise<User> {
+  async update(@Param('id') id: string, @Body() updateUser: Partial<User>): Promise<any> {
     try {
       const updatedUser = await this.userService.update(id, updateUser);
-      return updatedUser;
+      if (updatedUser) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'User updated successfully',
+          data: updatedUser,
+        };
+      } else {
+        throw new NotFoundException('User not found');
+      }
     } catch (error) {
-      throw new NotFoundException('User not found');
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Failed to update user',
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -68,17 +129,27 @@ export class UserController {
     @Body('userId') userId: string,
     @Body('currentPassword') currentPassword: string,
     @Body('newPassword') newPassword: string,
-  ): Promise<void> {
-    const user = await this.userService.findById(userId);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+  ): Promise<{ message: string }> {
+    try {
+      const user = await this.userService.findById(userId);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
 
-    const isPasswordValid = await this.userService.verifyPassword(user, currentPassword);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid current password');
-    }
+      const isPasswordValid = await this.userService.verifyPassword(user, currentPassword);
+      if (!isPasswordValid) {
+        throw new UnauthorizedException('Invalid current password');
+      }
 
-    await this.userService.changePassword(userId, newPassword);
+      await this.userService.changePassword(userId, newPassword);
+
+      return { message: 'Password changed successfully' };
+    } catch (error) {
+      if (error instanceof NotFoundException || error instanceof UnauthorizedException) {
+        throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+      } else {
+        throw new HttpException('An error occurred', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
   }
 }
