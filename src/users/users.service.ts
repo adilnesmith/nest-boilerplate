@@ -63,8 +63,10 @@ export class UserService {
       // Calculate pagination metadata
       const totalPages = Math.ceil(totalCount / limit);
 
+      const items = await query.exec();
+
       return {
-        data: await query.exec(),
+        items,
         pagination: {
           page,
           limit,
@@ -76,9 +78,10 @@ export class UserService {
 
     const data = await query.exec();
     return {
-      data,
+      items: data,
     };
   }
+
 
   async findOne(id: string): Promise<User> {
     const user = await this.userModel.findById(id).exec();
