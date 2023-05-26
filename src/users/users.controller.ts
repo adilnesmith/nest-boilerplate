@@ -45,9 +45,14 @@ export class UserController {
     }
   }
   @Get()
-  async findAll(@Query('sort') sort: string, @Query('order') order: string): Promise<any> {
+  async findAll(
+    @Query('sort') sort: string,
+    @Query('order') order: string,
+    @Query('page') page: number,
+    @Query('limit') limit: number
+  ): Promise<any> {
     try {
-      const users = await this.userService.findAll(sort, order);
+      const users = await this.userService.findAll(sort, order, page, limit);
       return {
         statusCode: HttpStatus.OK,
         message: 'Users retrieved successfully',
@@ -64,6 +69,7 @@ export class UserController {
       );
     }
   }
+
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<any> {
     try {

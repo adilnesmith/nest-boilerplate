@@ -41,17 +41,45 @@ export class UserService {
     Object.assign(user, updates);
     return user.save();
   }
-  async findAll(sort?: string, order?: string): Promise<User[]> {
+  async findAll(sort?: string, order?: string, page?: number, limit?: number): Promise<any> {
     let query = this.userModel.find();
-    // Check if sorting parameters are provided
+
+    // Apply sorting if sort and order parameters are provided
     if (sort && order) {
       const sortOptions: any = {};
       sortOptions[sort] = order === 'asc' ? 1 : -1;
       query = query.sort(sortOptions);
     }
 
-    return query.exec();
+    // Apply pagination if page and limit parameters are provided
+    if (page && limit) {
+      const startIndex = (page - 1) * limit;
+      const endIndex = page * limit;
+      query = query.skip(startIndex).limit(limit);
+
+      // Get the total count of documents for pagination metadata
+      const totalCount = await this.userModel.countDocuments().exec();
+
+      // Calculate pagination metadata
+      const totalPages = Math.ceil(totalCount / limit);
+
+      return {
+        data: await query.exec(),
+        pagination: {
+          page,
+          limit,
+          totalCount,
+          totalPages,
+        },
+      };
+    }
+
+    const data = await query.exec();
+    return {
+      data,
+    };
   }
+
   async findOne(id: string): Promise<User> {
     const user = await this.userModel.findById(id).exec();
     if (!user) {
