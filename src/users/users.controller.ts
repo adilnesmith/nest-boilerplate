@@ -44,9 +44,9 @@ export class UserController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() user: User): Promise<User> {
+  async update(@Param('id') id: string, @Body() updateUser: Partial<User>): Promise<User> {
     try {
-      const updatedUser = await this.userService.update(id, user);
+      const updatedUser = await this.userService.update(id, updateUser);
       return updatedUser;
     } catch (error) {
       throw new NotFoundException('User not found');

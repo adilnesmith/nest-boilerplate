@@ -35,6 +35,8 @@ export class UserService {
     if (updates.password) {
       const hashedPassword = await bcrypt.hash(updates.password, 10);
       updates.password = hashedPassword;
+    } else {
+      delete updates.password; // Remove the password property from the updates object
     }
 
     Object.assign(user, updates);
