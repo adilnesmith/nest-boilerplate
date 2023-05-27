@@ -1,14 +1,18 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
-import { IsNotEmpty, IsEmail } from 'class-validator';
+import { IsNotEmpty, IsEmail, IsOptional } from 'class-validator';
 import * as bcrypt from 'bcrypt';
 
 export type UserDocument = User & Document;
 
 @Schema({ timestamps: true })
 export class User {
+    @Prop()
+    id: number;
+
     @Prop({ required: true })
     @IsNotEmpty()
+    @IsOptional()
     fullName: string;
 
     @Prop({ required: true, unique: true })
