@@ -7,8 +7,6 @@ export type UserDocument = User & Document;
 
 @Schema({ timestamps: true })
 export class User {
-    @Prop()
-    id: number;
 
     @Prop({ required: true })
     @IsNotEmpty()
