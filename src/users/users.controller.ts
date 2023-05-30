@@ -45,7 +45,6 @@ export class UserController {
       );
     }
   }
-  @Public()
   @Get()
   async findAll(
     @Query('sort') sort: string,
