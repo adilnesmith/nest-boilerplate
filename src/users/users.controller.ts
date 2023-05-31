@@ -18,7 +18,6 @@ import {
 import { UserService } from './users.service';
 import { User } from './users.model';
 import { ValidationPipe } from '../validation.pipe';
-import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('users')
 export class UserController {

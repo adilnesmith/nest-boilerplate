@@ -29,9 +29,6 @@ export class User {
 
     modifiedAt: Date;
 
-    // async comparePassword(enteredPassword: string): Promise<boolean> {
-    //     return bcrypt.compare(enteredPassword, this.password);
-    // }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
