@@ -11,16 +11,16 @@ export class UserService {
   ) { }
 
   async create(user: User): Promise<User> {
-    const existingUser = await this.userModel.findOne({ email: user.email });
+    const existingUser = await this.userModel.findOne({ uid: user.uid });
 
     if (existingUser) {
       throw new BadRequestException('User with this email already exists');
     }
 
-    const hashedPassword = await bcrypt.hash(user.password, 10);
+    // const hashedPassword = await bcrypt.hash(user.password, 10);
     const createdUser = new this.userModel({
       ...user,
-      password: hashedPassword,
+      // password: hashedPassword,
     });
     return createdUser.save();
   }
@@ -31,12 +31,12 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    if (updates.password) {
-      const hashedPassword = await bcrypt.hash(updates.password, 10);
-      updates.password = hashedPassword;
-    } else {
-      delete updates.password; // Remove the password property from the updates object
-    }
+    // if (updates.password) {
+    //   const hashedPassword = await bcrypt.hash(updates.password, 10);
+    //   updates.password = hashedPassword;
+    // } else {
+    //   delete updates.password; // Remove the password property from the updates object
+    // }
 
     Object.assign(user, updates);
     return user.save();
@@ -103,12 +103,12 @@ export class UserService {
   async findById(userId: string): Promise<User | null> {
     return this.userModel.findById(userId).exec();
   }
-  async verifyPassword(user: User, currentPassword: string): Promise<boolean> {
-    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
-    return isPasswordValid;
-  }
-  async changePassword(userId: string, newPassword: string): Promise<void> {
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await this.userModel.findByIdAndUpdate(userId, { password: hashedPassword });
-  }
+  // async verifyPassword(user: User, currentPassword: string): Promise<boolean> {
+  //   const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+  //   return isPasswordValid;
+  // }
+  // async changePassword(userId: string, newPassword: string): Promise<void> {
+  //   const hashedPassword = await bcrypt.hash(newPassword, 10);
+  //   await this.userModel.findByIdAndUpdate(userId, { password: hashedPassword });
+  // }
 }

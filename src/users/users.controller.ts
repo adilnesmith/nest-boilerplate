@@ -129,32 +129,32 @@ export class UserController {
       throw new NotFoundException('User not found');
     }
   }
-  @Post('change-password')
-  async changePassword(
-    @Body('userId') userId: string,
-    @Body('currentPassword') currentPassword: string,
-    @Body('newPassword') newPassword: string,
-  ): Promise<{ message: string }> {
-    try {
-      const user = await this.userService.findById(userId);
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
+  // @Post('change-password')
+  // async changePassword(
+  //   @Body('userId') userId: string,
+  //   @Body('currentPassword') currentPassword: string,
+  //   @Body('newPassword') newPassword: string,
+  // ): Promise<{ message: string }> {
+  //   try {
+  //     const user = await this.userService.findById(userId);
+  //     if (!user) {
+  //       throw new NotFoundException('User not found');
+  //     }
 
-      const isPasswordValid = await this.userService.verifyPassword(user, currentPassword);
-      if (!isPasswordValid) {
-        throw new UnauthorizedException('Invalid current password');
-      }
+  //     const isPasswordValid = await this.userService.verifyPassword(user, currentPassword);
+  //     if (!isPasswordValid) {
+  //       throw new UnauthorizedException('Invalid current password');
+  //     }
 
-      await this.userService.changePassword(userId, newPassword);
+  //     await this.userService.changePassword(userId, newPassword);
 
-      return { message: 'Password changed successfully' };
-    } catch (error) {
-      if (error instanceof NotFoundException || error instanceof UnauthorizedException) {
-        throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
-      } else {
-        throw new HttpException('An error occurred', HttpStatus.INTERNAL_SERVER_ERROR);
-      }
-    }
-  }
+  //     return { message: 'Password changed successfully' };
+  //   } catch (error) {
+  //     if (error instanceof NotFoundException || error instanceof UnauthorizedException) {
+  //       throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+  //     } else {
+  //       throw new HttpException('An error occurred', HttpStatus.INTERNAL_SERVER_ERROR);
+  //     }
+  //   }
+  // }
 }

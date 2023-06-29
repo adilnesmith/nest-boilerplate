@@ -10,17 +10,22 @@ export class User {
 
     @Prop({ required: true })
     @IsNotEmpty()
-    @IsOptional()
-    fullName: string;
-
-    @Prop({ required: true, unique: true })
-    @IsNotEmpty()
-    @IsEmail()
-    email: string;
+    uid: string;
 
     @Prop({ required: true })
     @IsNotEmpty()
-    password: string;
+    @IsOptional()
+    fullName: string;
+
+
+    // @Prop({ required: true, unique: true })
+    // @IsNotEmpty()
+    // @IsEmail()
+    // email: string;
+
+    // @Prop({ required: true })
+    // @IsNotEmpty()
+    // password: string;
 
     @Prop()
     age: number;
