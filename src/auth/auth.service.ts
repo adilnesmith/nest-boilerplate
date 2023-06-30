@@ -11,50 +11,50 @@ export class AuthService {
     private jwtService: JwtService,
   ) { }
 
-  async signIn(email, pass) {
-    try {
-      const user = await this.usersService.findByEmail(email);
-      if (!user) {
-        throw new UnauthorizedException('User not found');
-      }
+  // async signIn(email, pass) {
+  //   try {
+  //     const user = await this.usersService.findByEmail(email);
+  //     if (!user) {
+  //       throw new UnauthorizedException('User not found');
+  //     }
 
-      const isPasswordValid = await bcrypt.compare(pass, user.password);
+  //     const isPasswordValid = await bcrypt.compare(pass, user.password);
 
-      if (!isPasswordValid) {
-        throw new UnauthorizedException('Invalid password');
-      }
+  //     if (!isPasswordValid) {
+  //       throw new UnauthorizedException('Invalid password');
+  //     }
 
-      const payload = { email: user.email };
-      const expiresIn = '30s';
-      const secret = jwtConstants.secret;
+  //     const payload = { email: user.email };
+  //     const expiresIn = '30s';
+  //     const secret = jwtConstants.secret;
 
-      // Generate access token
-      const access_token = await this.jwtService.signAsync(payload, {
-        expiresIn,
-        secret,
-      });
+  //     // Generate access token
+  //     const access_token = await this.jwtService.signAsync(payload, {
+  //       expiresIn,
+  //       secret,
+  //     });
 
-      // Generate refresh token
-      const refresh_token = await this.jwtService.signAsync(payload, {
-        expiresIn: '7d', // Set the refresh token expiration as per your requirement
-        secret,
-      });
+  //     // Generate refresh token
+  //     const refresh_token = await this.jwtService.signAsync(payload, {
+  //       expiresIn: '7d', // Set the refresh token expiration as per your requirement
+  //       secret,
+  //     });
 
-      return {
-        success: true,
-        message: 'Sign-in successful',
-        access_token,
-        refresh_token,
-      };
-    } catch (error) {
-      // Error handling
-      if (error instanceof UnauthorizedException) {
-        throw new UnauthorizedException(error.message);
-      } else {
-        throw new Error('An error occurred during sign-in');
-      }
-    }
-  }
+  //     return {
+  //       success: true,
+  //       message: 'Sign-in successful',
+  //       access_token,
+  //       refresh_token,
+  //     };
+  //   } catch (error) {
+  //     // Error handling
+  //     if (error instanceof UnauthorizedException) {
+  //       throw new UnauthorizedException(error.message);
+  //     } else {
+  //       throw new Error('An error occurred during sign-in');
+  //     }
+  //   }
+  // }
   async refreshToken(refreshToken: string): Promise<any> {
     try {
       // Verify the refresh token

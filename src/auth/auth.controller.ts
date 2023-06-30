@@ -18,9 +18,9 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  signIn(@Body() user: User): Promise<any> {
-    return this.authService.signIn(user.email, user.password);
-  }
+  // signIn(@Body() user: User): Promise<any> {
+  //   return this.authService.signIn(user.email, user.password);
+  // }
 
   @Get('profile')
   getProfile(@Request() req) {
